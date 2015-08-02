@@ -174,7 +174,7 @@ class PopulateCommand extends ContainerAwareCommand
         }
 
         $provider = $this->providerRegistry->getProvider($index, $type);
-        $loggerClosure = $this->progressClosureBuilder->build($output, 'Populating', $index, $type);
+        $loggerClosure = $this->progressClosureBuilder->build($output, 'Populating', $index, $type, $options['offset']);
         $provider->populate($loggerClosure, $event->getOptions());
 
         $this->dispatcher->dispatch(TypePopulateEvent::POST_TYPE_POPULATE, $event);

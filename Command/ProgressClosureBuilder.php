@@ -27,11 +27,11 @@ class ProgressClosureBuilder
      *
      * @return callable
      */
-    public function build(OutputInterface $output, $action, $index, $type)
+    public function build(OutputInterface $output, $action, $index, $type, $offset)
     {
         if (!class_exists('Symfony\Component\Console\Helper\ProgressBar') ||
             !is_callable(array('Symfony\Component\Console\Helper\ProgressBar', 'getProgress'))) {
-            return $this->buildLegacy($output, $action, $index, $type);
+            return $this->buildLegacy($output, $action, $index, $type, $offset);
         }
 
         $progress = null;
@@ -62,13 +62,14 @@ class ProgressClosureBuilder
      * @param string          $action
      * @param string          $index
      * @param string          $type
+     * @param int             $offset
      *
      * @return callable
      */
-    private function buildLegacy(OutputInterface $output, $action, $index, $type)
+    private function buildLegacy(OutputInterface $output, $action, $index, $type, $offset)
     {
         $lastStep = null;
-        $current = 0;
+        $current = $offset;
 
         return function ($increment, $totalObjects, $message = null) use ($output, $action, $index, $type, &$lastStep, &$current) {
             if ($current + $increment > $totalObjects) {
