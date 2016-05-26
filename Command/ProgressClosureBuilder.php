@@ -24,10 +24,11 @@ class ProgressClosureBuilder
      * @param string          $action
      * @param string          $index
      * @param string          $type
+     * @param int             $offset
      *
      * @return callable
      */
-    public function build(OutputInterface $output, $action, $index, $type)
+    public function build(OutputInterface $output, $action, $index, $type, $offset = 0)
     {
         if (!class_exists('Symfony\Component\Console\Helper\ProgressBar') ||
             !is_callable(array('Symfony\Component\Console\Helper\ProgressBar', 'getProgress'))) {
@@ -36,10 +37,11 @@ class ProgressClosureBuilder
 
         $progress = null;
 
-        return function ($increment, $totalObjects, $message = null) use (&$progress, $output, $action, $index, $type) {
+        return function ($increment, $totalObjects, $message = null) use (&$progress, $output, $action, $index, $type, $offset) {
             if (null === $progress) {
                 $progress = new ProgressBar($output, $totalObjects);
                 $progress->start();
+                $progress->advance($offset);
             }
 
             if (null !== $message) {

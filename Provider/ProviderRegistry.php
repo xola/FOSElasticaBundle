@@ -31,7 +31,10 @@ class ProviderRegistry implements ContainerAwareInterface
             $this->providers[$index] = array();
         }
 
-        $this->providers[$index][$type] = $providerId;
+        if (!isset($this->providers[$index][$type])) {
+            // No previous provider existings for this index & type
+            $this->providers[$index][$type] = $providerId;
+        }
     }
 
     /**
