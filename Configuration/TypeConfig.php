@@ -28,6 +28,11 @@ class TypeConfig
      */
     private $name;
 
+    /**
+     * @param string $name
+     * @param array  $mapping
+     * @param array  $config
+     */
     public function __construct($name, array $mapping, array $config = array())
     {
         $this->config = $config;
@@ -102,7 +107,17 @@ class TypeConfig
     }
 
     /**
+     * @return string|null
+     */
+    public function getDynamic()
+    {
+        return $this->getConfig('dynamic');
+    }
+
+    /**
      * @param string $key
+     *
+     * @return null|string
      */
     private function getConfig($key)
     {

@@ -2,21 +2,35 @@
 
 namespace FOS\ElasticaBundle\Subscriber;
 
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Knp\Component\Pager\Event\ItemsEvent;
 use FOS\ElasticaBundle\Paginator\PaginatorAdapterInterface;
 use FOS\ElasticaBundle\Paginator\PartialResultsInterface;
+use Knp\Component\Pager\Event\ItemsEvent;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
 
 class PaginateElasticaQuerySubscriber implements EventSubscriberInterface
 {
+    /**
+     * @var Request
+     */
     private $request;
 
-    public function setRequest(Request $request = null)
+    /**
+     * @param RequestStack|Request $requestStack
+     */
+    public function setRequest($requestStack)
     {
-        $this->request = $request;
+        if ($requestStack instanceof Request) {
+            $this->request = $requestStack;
+        } elseif ($requestStack instanceof RequestStack) {
+            $this->request = $requestStack->getMasterRequest();
+        }
     }
 
+    /**
+     * @param ItemsEvent $event
+     */
     public function items(ItemsEvent $event)
     {
         if ($event->target instanceof PaginatorAdapterInterface) {
@@ -51,10 +65,19 @@ class PaginateElasticaQuerySubscriber implements EventSubscriberInterface
         $options = $event->options;
         $sortField = $this->request->get($options['sortFieldParameterName']);
 
+        if (!$sortField && isset($options['defaultSortFieldName'])) {
+            $sortField = $options['defaultSortFieldName'];
+        }
+
         if (!empty($sortField)) {
             // determine sort direction
             $dir = 'asc';
             $sortDirection = $this->request->get($options['sortDirectionParameterName']);
+
+            if (!$sortDirection && isset($options['defaultSortDirection'])) {
+                $sortDirection = $options['defaultSortDirection'];
+            }
+
             if ('desc' === strtolower($sortDirection)) {
                 $dir = 'desc';
             }
@@ -71,6 +94,9 @@ class PaginateElasticaQuerySubscriber implements EventSubscriberInterface
         }
     }
 
+    /**
+     * @return array
+     */
     public static function getSubscribedEvents()
     {
         return array(
