@@ -90,14 +90,7 @@ class PopulateCommand extends ContainerAwareCommand
         $index = $input->getOption('index');
         $type = $input->getOption('type');
         $reset = !$input->getOption('no-reset');
-        $options = array(
-            'ignore_errors' => $input->getOption('ignore-errors'),
-            'offset' => $input->getOption('offset'),
-            'sleep' => $input->getOption('sleep')
-        );
-        if ($input->getOption('batch-size')) {
-            $options['batch_size'] = (int) $input->getOption('batch-size');
-        }
+        $options = $this->getOptions($input);
 
         if ($input->isInteractive() && $reset && $input->getOption('offset')) {
             /** @var DialogHelper $dialog */
@@ -126,6 +119,21 @@ class PopulateCommand extends ContainerAwareCommand
         }
     }
 
+    protected function getOptions(InputInterface $input)
+    {
+        $options = array(
+            'ignore_errors' => $input->getOption('ignore-errors'),
+            'offset' => $input->getOption('offset'),
+            'sleep' => $input->getOption('sleep')
+        );
+
+        if ($input->getOption('batch-size')) {
+            $options['batch_size'] = (int) $input->getOption('batch-size');
+        }
+
+        return $options;
+    }
+
     /**
      * Recreates an index, populates its types, and refreshes the index.
      *
@@ -134,7 +142,7 @@ class PopulateCommand extends ContainerAwareCommand
      * @param boolean         $reset
      * @param array           $options
      */
-    private function populateIndex(OutputInterface $output, $index, $reset, $options)
+    protected function populateIndex(OutputInterface $output, $index, $reset, $options)
     {
         $event = new IndexPopulateEvent($index, $reset, $options);
         $this->dispatcher->dispatch(IndexPopulateEvent::PRE_INDEX_POPULATE, $event);
@@ -163,7 +171,7 @@ class PopulateCommand extends ContainerAwareCommand
      * @param boolean         $reset
      * @param array           $options
      */
-    private function populateIndexType(OutputInterface $output, $index, $type, $reset, $options)
+    protected function populateIndexType(OutputInterface $output, $index, $type, $reset, $options)
     {
         $event = new TypePopulateEvent($index, $type, $reset, $options);
         $this->dispatcher->dispatch(TypePopulateEvent::PRE_TYPE_POPULATE, $event);
@@ -174,7 +182,7 @@ class PopulateCommand extends ContainerAwareCommand
         }
 
         $provider = $this->providerRegistry->getProvider($index, $type);
-        $loggerClosure = $this->progressClosureBuilder->build($output, 'Populating', $index, $type);
+        $loggerClosure = $this->progressClosureBuilder->build($output, 'Populating', $index, $type, $options['offset']);
         $provider->populate($loggerClosure, $event->getOptions());
 
         $this->dispatcher->dispatch(TypePopulateEvent::POST_TYPE_POPULATE, $event);

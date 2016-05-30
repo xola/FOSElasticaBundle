@@ -58,10 +58,11 @@ abstract class AbstractProvider extends BaseAbstractProvider
      * Creates the query builder, which will be used to fetch objects to index.
      *
      * @param string $method
+     * @param array  $filters
      *
      * @return object
      */
-    abstract protected function createQueryBuilder($method);
+    abstract protected function createQueryBuilder($method, $filters = []);
 
     /**
      * Fetches a slice of objects using the query builder.
@@ -81,7 +82,8 @@ abstract class AbstractProvider extends BaseAbstractProvider
     {
         $manager = $this->managerRegistry->getManagerForClass($this->objectClass);
 
-        $queryBuilder = $this->createQueryBuilder($options['query_builder_method']);
+        $filters = (isset($options['filters'])) ? $options['filters'] : [];
+        $queryBuilder = $this->createQueryBuilder($options['query_builder_method'], $filters);
         $nbObjects = $this->countObjects($queryBuilder);
         $offset = $options['offset'];
 

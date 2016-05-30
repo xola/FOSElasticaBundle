@@ -46,7 +46,7 @@ class Provider extends AbstractProvider
     /**
      * {@inheritDoc}
      */
-    protected function countObjects($queryBuilder)
+    protected function countObjects($queryBuilder, $options = [])
     {
         if (!$queryBuilder instanceof Builder) {
             throw new InvalidArgumentTypeException($queryBuilder, 'Doctrine\ODM\MongoDB\Query\Builder');
@@ -77,7 +77,7 @@ class Provider extends AbstractProvider
     /**
      * {@inheritDoc}
      */
-    protected function createQueryBuilder($method)
+    protected function createQueryBuilder($method, $filters = [])
     {
         return $this->managerRegistry
             ->getManagerForClass($this->objectClass)
