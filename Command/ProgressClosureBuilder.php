@@ -1,5 +1,14 @@
 <?php
 
+/*
+ * This file is part of the FOSElasticaBundle package.
+ *
+ * (c) FriendsOfSymfony <http://friendsofsymfony.github.com/>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 /**
  * This file is part of the FOSElasticaBundle project.
  *
@@ -28,11 +37,11 @@ class ProgressClosureBuilder
      *
      * @return callable
      */
-    public function build(OutputInterface $output, $action, $index, $type, $offset = 0)
+    public function build(OutputInterface $output, $action, $index, $type, $offset)
     {
         if (!class_exists('Symfony\Component\Console\Helper\ProgressBar') ||
-            !is_callable(array('Symfony\Component\Console\Helper\ProgressBar', 'getProgress'))) {
-            return $this->buildLegacy($output, $action, $index, $type);
+            !is_callable(['Symfony\Component\Console\Helper\ProgressBar', 'getProgress'])) {
+            return $this->buildLegacy($output, $action, $index, $type, $offset);
         }
 
         $progress = null;
@@ -41,7 +50,7 @@ class ProgressClosureBuilder
             if (null === $progress) {
                 $progress = new ProgressBar($output, $totalObjects);
                 $progress->start();
-                $progress->advance($offset);
+                $progress->setProgress($offset);
             }
 
             if (null !== $message) {
@@ -57,20 +66,21 @@ class ProgressClosureBuilder
 
     /**
      * Builds a legacy closure that outputs lines for each step. Used in cases
-     * where the ProgressBar component doesnt exist or does not have the correct
+     * where the ProgressBar component doesn't exist or does not have the correct
      * methods to support what we need.
      *
      * @param OutputInterface $output
      * @param string          $action
      * @param string          $index
      * @param string          $type
+     * @param int             $offset
      *
      * @return callable
      */
-    private function buildLegacy(OutputInterface $output, $action, $index, $type)
+    private function buildLegacy(OutputInterface $output, $action, $index, $type, $offset)
     {
         $lastStep = null;
-        $current = 0;
+        $current = $offset;
 
         return function ($increment, $totalObjects, $message = null) use ($output, $action, $index, $type, &$lastStep, &$current) {
             if ($current + $increment > $totalObjects) {

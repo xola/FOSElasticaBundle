@@ -1,10 +1,19 @@
 <?php
 
+/*
+ * This file is part of the FOSElasticaBundle package.
+ *
+ * (c) FriendsOfSymfony <http://friendsofsymfony.github.com/>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace FOS\ElasticaBundle\Paginator;
 
-use Elastica\SearchableInterface;
 use Elastica\Query;
 use Elastica\ResultSet;
+use Elastica\SearchableInterface;
 use InvalidArgumentException;
 
 /**
@@ -28,19 +37,24 @@ class RawPaginatorAdapter implements PaginatorAdapterInterface
     private $options;
 
     /**
-     * @var integer the number of hits
+     * @var int the number of hits
      */
     private $totalHits;
-
-    /**
-     * @var array for the facets
-     */
-    private $facets;
 
     /**
      * @var array for the aggregations
      */
     private $aggregations;
+
+    /**
+     * @var array for the suggesters
+     */
+    private $suggests;
+
+    /**
+     * @var float
+     */
+    private $maxScore;
 
     /**
      * @see PaginatorAdapterInterface::__construct
@@ -49,18 +63,18 @@ class RawPaginatorAdapter implements PaginatorAdapterInterface
      * @param Query               $query      the query to search
      * @param array               $options
      */
-    public function __construct(SearchableInterface $searchable, Query $query, array $options = array())
+    public function __construct(SearchableInterface $searchable, Query $query, array $options = [])
     {
         $this->searchable = $searchable;
-        $this->query      = $query;
-        $this->options    = $options;
+        $this->query = $query;
+        $this->options = $options;
     }
 
     /**
      * Returns the paginated results.
      *
-     * @param integer $offset
-     * @param integer $itemCountPerPage
+     * @param int $offset
+     * @param int $itemCountPerPage
      *
      * @throws \InvalidArgumentException
      *
@@ -68,10 +82,10 @@ class RawPaginatorAdapter implements PaginatorAdapterInterface
      */
     protected function getElasticaResults($offset, $itemCountPerPage)
     {
-        $offset = (integer) $offset;
-        $itemCountPerPage = (integer) $itemCountPerPage;
+        $offset = (int) $offset;
+        $itemCountPerPage = (int) $itemCountPerPage;
         $size = $this->query->hasParam('size')
-            ? (integer) $this->query->getParam('size')
+            ? (int) $this->query->getParam('size')
             : null;
 
         if (null !== $size && $size < $offset + $itemCountPerPage) {
@@ -88,12 +102,9 @@ class RawPaginatorAdapter implements PaginatorAdapterInterface
 
         $resultSet = $this->searchable->search($query, $this->options);
         $this->totalHits = $resultSet->getTotalHits();
-
-        if (method_exists($resultSet, 'getFacets')) {
-            $this->facets = $resultSet->getFacets();
-        }
-        
         $this->aggregations = $resultSet->getAggregations();
+        $this->suggests = $resultSet->getSuggests();
+        $this->maxScore = $resultSet->getMaxScore();
 
         return $resultSet;
     }
@@ -117,25 +128,13 @@ class RawPaginatorAdapter implements PaginatorAdapterInterface
      */
     public function getTotalHits($genuineTotal = false)
     {
-        if (! isset($this->totalHits)) {
+        if (!isset($this->totalHits)) {
             $this->totalHits = $this->searchable->count($this->query);
         }
 
         return $this->query->hasParam('size') && !$genuineTotal
-            ? min($this->totalHits, (integer) $this->query->getParam('size'))
+            ? min($this->totalHits, (int) $this->query->getParam('size'))
             : $this->totalHits;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getFacets()
-    {
-        if (! isset($this->facets)) {
-            $this->facets = $this->searchable->search($this->query)->getFacets();
-        }
-
-        return $this->facets;
     }
 
     /**
@@ -148,6 +147,30 @@ class RawPaginatorAdapter implements PaginatorAdapterInterface
         }
 
         return $this->aggregations;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getSuggests()
+    {
+        if (!isset($this->suggests)) {
+            $this->suggests = $this->searchable->search($this->query)->getSuggests();
+        }
+
+        return $this->suggests;
+    }
+
+    /**
+     * @return float
+     */
+    public function getMaxScore()
+    {
+        if (!isset($this->maxScore)) {
+            $this->maxScore = $this->searchable->search($this->query)->getMaxScore();
+        }
+
+        return $this->maxScore;
     }
 
     /**
