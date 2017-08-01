@@ -1,5 +1,14 @@
 <?php
 
+/*
+ * This file is part of the FOSElasticaBundle package.
+ *
+ * (c) FriendsOfSymfony <http://friendsofsymfony.github.com/>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace FOS\ElasticaBundle\Doctrine;
 
 use Doctrine\Common\Persistence\Event\LifecycleEventArgs;
@@ -35,21 +44,21 @@ class Listener
      *
      * @var array
      */
-    public $scheduledForInsertion = array();
+    public $scheduledForInsertion = [];
 
     /**
      * Objects scheduled to be updated or removed.
      *
      * @var array
      */
-    public $scheduledForUpdate = array();
+    public $scheduledForUpdate = [];
 
     /**
      * IDs of objects scheduled for removal.
      *
      * @var array
      */
-    public $scheduledForDeletion = array();
+    public $scheduledForDeletion = [];
 
     /**
      * PropertyAccessor instance.
@@ -74,14 +83,13 @@ class Listener
     public function __construct(
         ObjectPersisterInterface $objectPersister,
         IndexableInterface $indexable,
-        array $config = array(),
+        array $config = [],
         LoggerInterface $logger = null
     ) {
-        $this->config = array_merge(array(
+        $this->config = array_merge([
             'identifier' => 'id',
-            'async' => false,
-            'defer' => false
-        ), $config);
+            'defer' => false,
+        ], $config);
         $this->indexable = $indexable;
         $this->objectPersister = $objectPersister;
         $this->propertyAccessor = PropertyAccess::createPropertyAccessor();
@@ -92,12 +100,12 @@ class Listener
     }
 
     /**
-     * Handler for the "kernel.terminate" Symfony event. This event is subscribed to if the listener is configured to
-     * persist asynchronously.
+     * Handler for the "kernel.terminate" and "console.terminate" Symfony events.
+     * These event are subscribed to if the listener is configured to persist asynchronously.
      */
-    public function onKernelTerminate()
+    public function onTerminate()
     {
-        if($this->config['async'] && $this->config['defer']) {
+        if ($this->config['defer']) {
             $this->config['defer'] = false;
             $this->persistScheduled();
         }
@@ -167,18 +175,18 @@ class Listener
      */
     private function persistScheduled()
     {
-        if($this->shouldPersist()) {
+        if ($this->shouldPersist()) {
             if (count($this->scheduledForInsertion)) {
                 $this->objectPersister->insertMany($this->scheduledForInsertion);
-                $this->scheduledForInsertion = array();
+                $this->scheduledForInsertion = [];
             }
             if (count($this->scheduledForUpdate)) {
                 $this->objectPersister->replaceMany($this->scheduledForUpdate);
-                $this->scheduledForUpdate = array();
+                $this->scheduledForUpdate = [];
             }
             if (count($this->scheduledForDeletion)) {
                 $this->objectPersister->deleteManyByIdentifiers($this->scheduledForDeletion);
-                $this->scheduledForDeletion = array();
+                $this->scheduledForDeletion = [];
             }
         }
     }
@@ -192,7 +200,7 @@ class Listener
      *
      * @deprecated This method should only be called in applications that depend
      *             on the behaviour that entities are indexed regardless of if a
-     *             flush is successful.
+     *             flush is successful
      */
     public function preFlush()
     {
