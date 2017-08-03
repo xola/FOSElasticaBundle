@@ -1,11 +1,20 @@
 <?php
 
+/*
+ * This file is part of the FOSElasticaBundle package.
+ *
+ * (c) FriendsOfSymfony <http://friendsofsymfony.github.com/>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace FOS\ElasticaBundle\DataCollector;
 
 use FOS\ElasticaBundle\Logger\ElasticaLogger;
-use Symfony\Component\HttpKernel\DataCollector\DataCollector;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\DataCollector\DataCollector;
 
 /**
  * Data collector collecting elastica statistics.
@@ -57,6 +66,19 @@ class ElasticaDataCollector extends DataCollector
         $time = 0;
         foreach ($this->data['queries'] as $query) {
             $time += $query['engineMS'];
+        }
+
+        return $time;
+    }
+
+    /**
+     * @return int
+     */
+    public function getExecutionTime()
+    {
+        $time = 0;
+        foreach ($this->data['queries'] as $query) {
+            $time += $query['executionMS'];
         }
 
         return $time;
