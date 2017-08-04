@@ -103,17 +103,7 @@ class PopulateCommand extends ContainerAwareCommand
         $reset = !$input->getOption('no-reset');
         $delete = !$input->getOption('no-delete');
 
-        $options = [
-            'delete' => $delete,
-            'reset' => $reset,
-            'ignore_errors' => $input->getOption('ignore-errors'),
-            'offset' => $input->getOption('offset'),
-            'sleep' => $input->getOption('sleep'),
-        ];
-
-        if ($input->getOption('batch-size')) {
-            $options['batch_size'] = (int) $input->getOption('batch-size');
-        }
+        $options = $this->getOptions($input, $delete, $reset);
 
         if ($input->isInteractive() && $reset && $input->getOption('offset')) {
             /** @var QuestionHelper $dialog */
@@ -150,7 +140,7 @@ class PopulateCommand extends ContainerAwareCommand
      * @param bool            $reset
      * @param array           $options
      */
-    private function populateIndex(OutputInterface $output, $index, $reset, $options)
+    protected function populateIndex(OutputInterface $output, $index, $reset, $options)
     {
         $event = new IndexPopulateEvent($index, $reset, $options);
         $this->dispatcher->dispatch(IndexPopulateEvent::PRE_INDEX_POPULATE, $event);
@@ -179,7 +169,7 @@ class PopulateCommand extends ContainerAwareCommand
      * @param bool            $reset
      * @param array           $options
      */
-    private function populateIndexType(OutputInterface $output, $index, $type, $reset, $options)
+    protected function populateIndexType(OutputInterface $output, $index, $type, $reset, $options)
     {
         $event = new TypePopulateEvent($index, $type, $reset, $options);
         $this->dispatcher->dispatch(TypePopulateEvent::PRE_TYPE_POPULATE, $event);
@@ -209,5 +199,21 @@ class PopulateCommand extends ContainerAwareCommand
     {
         $output->writeln(sprintf('<info>Refreshing</info> <comment>%s</comment>', $index));
         $this->indexManager->getIndex($index)->refresh();
+    }
+
+    protected function getOptions(InputInterface $input, $delete, $reset)
+    {
+        $options = [
+            'delete' => $delete,
+            'reset' => $reset,
+            'ignore_errors' => $input->getOption('ignore-errors'),
+            'offset' => $input->getOption('offset'),
+            'sleep' => $input->getOption('sleep'),
+        ];
+
+        if ($input->getOption('batch-size')) {
+            $options['batch_size'] = (int)$input->getOption('batch-size');
+        }
+        return $options;
     }
 }

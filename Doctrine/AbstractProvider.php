@@ -90,7 +90,8 @@ abstract class AbstractProvider extends BaseAbstractProvider
     {
         $manager = $this->managerRegistry->getManagerForClass($this->objectClass);
 
-        $queryBuilder = $this->createQueryBuilder($options['query_builder_method']);
+        $arguments = (isset($options['arguments'])) ? $options['arguments'] : [];
+        $queryBuilder = $this->createQueryBuilder($options['query_builder_method'], $arguments);
         $nbObjects = $this->countObjects($queryBuilder);
         $offset = $options['offset'];
 
