@@ -41,13 +41,13 @@ class Client extends BaseClient
     /**
      * {@inheritdoc}
      */
-    public function request($path, $method = Request::GET, $data = [], array $query = [], $contentType = Request::DEFAULT_CONTENT_TYPE)
+    public function request($path, $method = Request::GET, $data = [], array $query = [])
     {
         if ($this->stopwatch) {
             $this->stopwatch->start('es_request', 'fos_elastica');
         }
 
-        $response = parent::request($path, $method, $data, $query, $contentType);
+        $response = parent::request($path, $method, $data, $query);
         $responseData = $response->getData();
 
         if (isset($responseData['took']) && isset($responseData['hits'])) {
