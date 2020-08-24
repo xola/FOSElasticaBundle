@@ -42,12 +42,12 @@ class PopulateCommand extends Command
     protected static $defaultName = 'fos:elastica:populate';
 
     /**
-     * @var EventDispatcherInterface 
+     * @var EventDispatcherInterface
      */
     private $dispatcher;
 
     /**
-     * @var IndexManager 
+     * @var IndexManager
      */
     private $indexManager;
 
@@ -132,7 +132,7 @@ class PopulateCommand extends Command
         $reset = !$input->getOption('no-reset');
         $delete = !$input->getOption('no-delete');
 
-
+        $options = $this->getOptions($input, $delete, $reset);
 
         if ($input->isInteractive() && $reset && 1 < $options['first_page']) {
             /** @var QuestionHelper $dialog */
