@@ -132,18 +132,7 @@ class PopulateCommand extends Command
         $reset = !$input->getOption('no-reset');
         $delete = !$input->getOption('no-delete');
 
-        $options = [
-            'delete' => $delete,
-            'reset' => $reset,
-            'ignore_errors' => $input->getOption('ignore-errors'),
-            'sleep' => $input->getOption('sleep'),
-            'first_page' => $input->getOption('first-page'),
-            'max_per_page' => $input->getOption('max-per-page'),
-        ];
 
-        if ($input->getOption('last-page')) {
-            $options['last_page'] = $input->getOption('last-page');
-        }
 
         if ($input->isInteractive() && $reset && 1 < $options['first_page']) {
             /** @var QuestionHelper $dialog */
@@ -290,13 +279,15 @@ class PopulateCommand extends Command
             'delete' => $delete,
             'reset' => $reset,
             'ignore_errors' => $input->getOption('ignore-errors'),
-            'offset' => $input->getOption('offset'),
             'sleep' => $input->getOption('sleep'),
+            'first_page' => $input->getOption('first-page'),
+            'max_per_page' => $input->getOption('max-per-page'),
         ];
 
-        if ($input->getOption('batch-size')) {
-            $options['batch_size'] = (int)$input->getOption('batch-size');
+        if ($input->getOption('last-page')) {
+            $options['last_page'] = $input->getOption('last-page');
         }
+
         return $options;
     }
 }
