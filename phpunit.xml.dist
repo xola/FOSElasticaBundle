@@ -1,24 +1,31 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<phpunit bootstrap="./vendor/autoload.php" colors="true">
+<phpunit
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="http://schema.phpunit.de/6.5/phpunit.xsd"
+        colors                                     = "true"
+        beStrictAboutOutputDuringTests             = "true"
+        beStrictAboutTestsThatDoNotTestAnything    = "false"
+        convertDeprecationsToExceptions            = "false"
+        verbose                                    = "true"
+        bootstrap                                  = "vendor/autoload.php"
+>
     <php>
-        <server name="SYMFONY__FOS_ELASTICA__HOST" value="localhost" />
-        <server name="SYMFONY__FOS_ELASTICA__PORT" value="9200" />
+        <server name="FOS_ELASTICA_HOST" value="localhost" />
+        <server name="FOS_ELASTICA_PORT" value="9200" />
     </php>
 
     <testsuites>
         <testsuite name="FOSElasticaBundle Test Suite">
-            <directory>./Tests</directory>
+            <directory>./tests</directory>
         </testsuite>
     </testsuites>
 
     <filter>
         <whitelist>
-            <directory>./</directory>
+            <directory>./src</directory>
             <exclude>
-                <directory>./Resources</directory>
-                <directory>./Tests</directory>
-                <directory>./vendor</directory>
+                <directory>./src/Resources</directory>
             </exclude>
         </whitelist>
     </filter>
