@@ -35,7 +35,8 @@
         "symfony/serializer": "^3.4|^4|^5.4",
         "symfony/yaml": "^3.4|^4|^5.4",
         "friendsofphp/php-cs-fixer": "^2.2",
-        "symfony/web-profiler-bundle": "^3.4|^4.0|^5.4"
+        "symfony/web-profiler-bundle": "^3.4|^4.0|^5.4",
+        "phpspec/prophecy-phpunit": "^2.4"
     },
     "suggest": {
         "enqueue/elastica-bundle": "The bundle adds extra features to FOSElasticaBundle bundle. Aimed to improve performance."

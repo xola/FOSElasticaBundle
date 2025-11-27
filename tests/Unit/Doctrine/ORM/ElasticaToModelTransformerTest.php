@@ -11,9 +11,9 @@
 
 namespace FOS\ElasticaBundle\Tests\Unit\Doctrine\ORM;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
-use Doctrine\Common\Persistence\ObjectManager;
-use Doctrine\Common\Persistence\ObjectRepository;
+use Doctrine\Persistence\ManagerRegistry;
+use Doctrine\Persistence\ObjectManager;
+use Doctrine\Persistence\ObjectRepository;
 use Doctrine\ORM\AbstractQuery;
 use Doctrine\ORM\Query\Expr;
 use Doctrine\ORM\QueryBuilder;

@@ -2,7 +2,7 @@
 
 namespace FOS\ElasticaBundle\Tests\Unit\Doctrine;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\ODM\PHPCR\DocumentManager;
 use Doctrine\ODM\PHPCR\DocumentRepository;
 use Doctrine\ODM\PHPCR\Query\Builder\QueryBuilder;

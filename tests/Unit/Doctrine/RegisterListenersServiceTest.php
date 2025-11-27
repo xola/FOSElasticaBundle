@@ -2,7 +2,7 @@
 
 namespace FOS\ElasticaBundle\Tests\Unit\Doctrine;
 
-use Doctrine\Common\Persistence\ObjectManager;
+use Doctrine\Persistence\ObjectManager;
 use Doctrine\DBAL\Connection;
 use Doctrine\ORM\Configuration;
 use Doctrine\ORM\EntityManagerInterface;
