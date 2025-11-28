@@ -105,9 +105,11 @@ class PopulateCommand extends Command
             ->addOption('ignore-errors', null, InputOption::VALUE_NONE, 'Do not stop on errors')
             ->addOption('no-overwrite-format', null, InputOption::VALUE_NONE, 'Prevent this command from overwriting ProgressBar\'s formats')
 
+            ->addOption('offset', null, InputOption::VALUE_REQUIRED, 'The offset to start population from', 0)
             ->addOption('first-page', null, InputOption::VALUE_REQUIRED, 'The pager\'s page to start population from. Including the given page.', 1)
             ->addOption('last-page', null, InputOption::VALUE_REQUIRED, 'The pager\'s page to end population on. Including the given page.', null)
             ->addOption('max-per-page', null, InputOption::VALUE_REQUIRED, 'The pager\'s page size', 100)
+            ->addOption('batch-size', null, InputOption::VALUE_REQUIRED, 'The batch size for persisting', null)
             ->addOption('pager-persister', null, InputOption::VALUE_REQUIRED, 'The pager persister to be used to populate the index', InPlacePagerPersister::NAME)
 
             ->setDescription('Populates search indexes from providers')
@@ -137,10 +139,15 @@ class PopulateCommand extends Command
             'delete' => $delete,
             'reset' => $reset,
             'ignore_errors' => $input->getOption('ignore-errors'),
+            'offset' => $input->getOption('offset'),
             'sleep' => $input->getOption('sleep'),
             'first_page' => $input->getOption('first-page'),
             'max_per_page' => $input->getOption('max-per-page'),
         ];
+
+        if ($input->getOption('batch-size')) {
+            $options['batch_size'] = (int) $input->getOption('batch-size');
+        }
 
         if ($input->getOption('last-page')) {
             $options['last_page'] = $input->getOption('last-page');
@@ -183,7 +190,7 @@ class PopulateCommand extends Command
      * @param bool            $reset
      * @param array           $options
      */
-    private function populateIndex(OutputInterface $output, $index, $reset, $options)
+    protected function populateIndex(OutputInterface $output, $index, $reset, $options)
     {
         $event = new IndexPopulateEvent($index, $reset, $options);
         $this->dispatch($event, IndexPopulateEvent::PRE_INDEX_POPULATE);
@@ -212,7 +219,7 @@ class PopulateCommand extends Command
      * @param bool            $reset
      * @param array           $options
      */
-    private function populateIndexType(OutputInterface $output, $index, $type, $reset, $options)
+    protected function populateIndexType(OutputInterface $output, $index, $type, $reset, $options)
     {
         $event = new TypePopulateEvent($index, $type, $reset, $options);
         $this->dispatch($event, TypePopulateEvent::PRE_TYPE_POPULATE);
